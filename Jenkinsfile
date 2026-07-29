@@ -1,13 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        // Force kubectl to use the copied config file
+        KUBECONFIG = 'C:\\ProgramData\\Jenkins\\.jenkins\\.kube\\config'
+    }
+
     stages {
-        stage('Checkout') {
-            steps {
-                echo 'Checking out source code...'
-            }
-        }
-        
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t static-web-app:latest .'
