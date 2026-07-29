@@ -26,7 +26,7 @@ kind: Service
 metadata:
   name: static-web-service
 spec:
-  type: Loadbalancer
+  type: LoadBalancer
   selector:
     app: static-web-app
   ports:
