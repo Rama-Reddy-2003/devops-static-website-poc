@@ -3,7 +3,9 @@ kind: Deployment
 metadata:
   name: static-web-app
 spec:
-  replicas: 1  
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: static-web-app
