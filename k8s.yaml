@@ -17,7 +17,7 @@ spec:
       containers:
       - name: static-web-app
         image: static-web-app:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
 ---
