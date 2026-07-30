@@ -8,9 +8,11 @@ pipeline {
         IMAGE_NAME  = 'static-web-app'
         IMAGE_TAG   = 'latest'
         FULL_IMAGE  = "${DOCKER_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
+        
+        // Context matching your Docker Desktop Kubernetes cluster
         K8S_CONTEXT = 'docker-desktop'
         
-        // Pass Docker Hub credentials stored securely in Jenkins
+        // Jenkins Credentials ID for Docker Hub
         DOCKER_HUB_CREDS = credentials('dockeruserid') 
     }
 
@@ -25,7 +27,6 @@ pipeline {
         stage('Push Image to Docker Hub') {
             steps {
                 echo "Logging in and pushing image to Docker Hub..."
-                // Log in to Docker Hub using Jenkins environment variables
                 bat "docker login -u %DOCKER_HUB_CREDS_USR% -p %DOCKER_HUB_CREDS_PSW%"
                 bat "docker push ${FULL_IMAGE}"
             }
@@ -35,14 +36,15 @@ pipeline {
             steps {
                 echo "Applying Kubernetes manifests..."
                 bat "kubectl apply -f k8s.yaml --context=${K8S_CONTEXT}"
-                bat "kubectl rollout restart deployment/static-web-deployment --context=${K8S_CONTEXT}"
+                // Corrected deployment name from k8s.yaml: static-web-app
+                bat "kubectl rollout restart deployment/static-web-app --context=${K8S_CONTEXT}"
             }
         }
 
         stage('Verify Deployment') {
             steps {
                 echo "Checking pod and service status..."
-                bat "kubectl rollout status deployment/static-web-deployment --context=${K8S_CONTEXT}"
+                bat "kubectl rollout status deployment/static-web-app --context=${K8S_CONTEXT}"
                 bat "kubectl get pods --context=${K8S_CONTEXT}"
                 bat "kubectl get svc static-web-service --context=${K8S_CONTEXT}"
             }
@@ -54,7 +56,7 @@ pipeline {
             echo "Pipeline run completed."
         }
         success {
-            echo "Build, push, and deployment succeeded!"
+            echo "Build, push, and Kubernetes deployment succeeded!"
         }
         failure {
             echo "Deployment failed. Check the logs above for details."
