@@ -1,0 +1,22 @@
+name: Validate Files
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-repository:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Validate Website & K8s Files
+      run: |
+        echo "=== Running File Validation ==="
+        test -s index.html || (echo "Error: index.html is missing or empty!" && exit 1)
+        test -s k8s.yaml || (echo "Error: k8s.yaml is missing or empty!" && exit 1)
+        echo "All required files are present and non-empty!"
