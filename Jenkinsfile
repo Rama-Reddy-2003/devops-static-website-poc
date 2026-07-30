@@ -8,7 +8,7 @@ pipeline {
         IMAGE_NAME  = 'static-web-app'
         IMAGE_TAG   = 'latest'
         FULL_IMAGE  = "${DOCKER_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
-        K8S_CONTEXT = 'kind-kind'
+        K8S_CONTEXT = 'docker-desktop'
         
         // Pass Docker Hub credentials stored securely in Jenkins
         DOCKER_HUB_CREDS = credentials('dockeruserid') 
