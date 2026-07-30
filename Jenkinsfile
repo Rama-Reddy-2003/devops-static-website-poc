@@ -9,23 +9,25 @@ pipeline {
         IMAGE_TAG   = 'latest'
         FULL_IMAGE  = "${DOCKER_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
         K8S_CONTEXT = 'kind-kind'
-
-        // Provide the absolute path to your kind executable
-        KIND_EXE   = 'C:\\kind\\kind.exe'  // <--- Update this to your exact kind.exe path
+        
+        // Pass Docker Hub credentials stored securely in Jenkins
+        DOCKER_HUB_CREDS = credentials('dockeruserid') 
     }
 
     stages {
-        stage('Pull Latest Image') {
+        stage('Build Docker Image') {
             steps {
-                echo "Pulling latest image from Docker Hub..."
-                bat "docker pull ${FULL_IMAGE}"
+                echo "Building Docker image locally..."
+                bat "docker build -t ${FULL_IMAGE} ."
             }
         }
 
-        stage('Load Image to Kind') {
+        stage('Push Image to Docker Hub') {
             steps {
-                echo "Loading Docker image into Kind cluster..."
-                bat "\"${KIND_EXE}\" load docker-image ${FULL_IMAGE} --name kind"
+                echo "Logging in and pushing image to Docker Hub..."
+                // Log in to Docker Hub using Jenkins environment variables
+                bat "docker login -u %DOCKER_HUB_CREDS_USR% -p %DOCKER_HUB_CREDS_PSW%"
+                bat "docker push ${FULL_IMAGE}"
             }
         }
 
@@ -52,7 +54,7 @@ pipeline {
             echo "Pipeline run completed."
         }
         success {
-            echo "Deployment to Kind cluster succeeded!"
+            echo "Build, push, and deployment succeeded!"
         }
         failure {
             echo "Deployment failed. Check the logs above for details."
